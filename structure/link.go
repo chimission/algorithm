@@ -33,23 +33,47 @@ func (linkNode *LinkNode) Len() (lenght int) {
 	return lenght
 }
 
+func (linkNode *LinkNode) Insert(data int64, index int) *LinkNode { //TODO judge length
+
+	if index == 0 {
+		newLinkNode := NewLinkNode(data)
+		newLinkNode.Next = linkNode
+		return newLinkNode
+	} else {
+		header := linkNode
+		for i := 0; linkNode != nil; i++ {
+			if i == index-1 {
+				newLinkNode := NewLinkNode(data)
+				t := newLinkNode.Next
+				linkNode.Next = newLinkNode
+				newLinkNode.Next = t
+			}
+			linkNode = linkNode.Next
+		}
+		return header
+	}
+
+}
+
 func (linkNode *LinkNode) Delete(index int) *LinkNode {
 	if index == 0 {
-		t := linkNode.Next
-		linkNode.Next = nil
-		return t
-	}
-	header := linkNode
-	pre := linkNode
-	for i := 0; pre != nil; i++ {
-		if i == index-1 {
-			t := pre.Next
-			pre.Next = pre.Next.Next
-			t.Next = nil
+		pre := linkNode
+		linkNode = linkNode.Next
+		pre.Next = nil
+
+	} else {
+		pre := linkNode
+		for i := 0; pre != nil; i++ {
+			if i == index-1 {
+				t := pre.Next
+				pre.Next = pre.Next.Next
+				t.Next = nil
+			}
+			pre = pre.Next
 		}
-		pre = pre.Next
 	}
-	return header
+
+	return linkNode
 }
 
 func (linkNode *LinkNode) Print() {
@@ -57,4 +81,5 @@ func (linkNode *LinkNode) Print() {
 		fmt.Print(linkNode.Data, "-->")
 		linkNode = linkNode.Next
 	}
+	fmt.Println("nil")
 }
