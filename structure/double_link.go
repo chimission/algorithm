@@ -16,9 +16,8 @@ type DoubleLink struct {
 	len  int
 }
 
-func InitDoubleLink(data int) *DoubleLink {
-	node := &DoubleLinkNode{data: data, next: nil, prev: nil}
-	return &DoubleLink{head: node, tail: node, len: 1}
+func InitDoubleLink() *DoubleLink {
+	return &DoubleLink{head: nil, tail: nil, len: 0}
 }
 
 func (doubleLink *DoubleLink) AddFrontNode(data int) {
@@ -37,30 +36,21 @@ func (doubleLink *DoubleLink) AddFrontNode(data int) {
 
 func (doubleLink *DoubleLink) AddEndNode(data int) {
 	newNode := &DoubleLinkNode{data: data}
-	if doubleLink.head == nil {
+	if doubleLink.tail == nil {
 		doubleLink.head = newNode
 		doubleLink.tail = newNode
 	} else {
-		currentNode := doubleLink.head
-		for currentNode.next != nil {
-			currentNode = currentNode.next
-		}
-		currentNode.next = newNode
-		newNode.prev = currentNode
+		newNode.prev = doubleLink.tail
+		doubleLink.tail.next = newNode
+		doubleLink.tail = newNode
 	}
 	doubleLink.len++
 }
 
-func (doubleLink *DoubleLink) Insert(data, index int) {
-	if doubleLink.len < index-1 {
-		return
-	}
-	newNode := &DoubleLinkNode{data: data}
+func (doubleLink *DoubleLink) InsertByHead(newNode *DoubleLinkNode, index int) {
 	currentIndex := 0
 	currentNode := doubleLink.head
 	for currentNode.next != nil {
-		currentNode = currentNode.next
-		currentIndex++
 		if currentIndex == index-1 {
 			currentNode.next.prev = newNode
 			newNode.next = currentNode.next
@@ -68,6 +58,48 @@ func (doubleLink *DoubleLink) Insert(data, index int) {
 			currentNode.next = newNode
 			doubleLink.len++
 			return
+		}
+		currentNode = currentNode.next
+		currentIndex++
+	}
+
+}
+
+func (doubleLink *DoubleLink) InsertByTail(newNode *DoubleLinkNode, index int) {
+	currentIndex := doubleLink.len
+	currentNode := doubleLink.tail
+	for currentNode.prev != nil {
+		if currentIndex == index+1 {
+			currentNode.prev.next = newNode
+			newNode.prev = currentNode.prev
+			newNode.next = currentNode
+			currentNode.prev = newNode
+			doubleLink.len++
+			return
+		}
+		currentNode = currentNode.prev
+		currentIndex--
+	}
+
+}
+
+func (doubleLink *DoubleLink) Insert(data, index int) {
+	if index < 0 || index > doubleLink.len {
+		return
+	}
+	fmt.Println(doubleLink.len, index)
+	if index == 0 {
+		doubleLink.AddFrontNode(data)
+	} else if index == doubleLink.len {
+		doubleLink.AddEndNode(data)
+	} else {
+		newNode := &DoubleLinkNode{data: data}
+		//  判断插入位置靠近head 还是 靠近tail 减少循环量
+		m := doubleLink.len / 2
+		if index <= m {
+			doubleLink.InsertByHead(newNode, index)
+		} else {
+			doubleLink.InsertByTail(newNode, index)
 		}
 	}
 
@@ -77,8 +109,8 @@ func (doubleLinkNode *DoubleLinkNode) Print() {
 	fmt.Printf("=%d=", doubleLinkNode.data)
 }
 
-func (doubleLink *DoubleLink) Print() {
-	fmt.Print("header=>")
+func (doubleLink *DoubleLink) HeadPrint() {
+	fmt.Print("header=")
 	currentNode := doubleLink.head
 	if currentNode != nil {
 		currentNode.Print()
@@ -87,5 +119,18 @@ func (doubleLink *DoubleLink) Print() {
 			currentNode.Print()
 		}
 	}
-	fmt.Println("<=tail")
+	fmt.Println("=tail")
+}
+
+func (doubleLink *DoubleLink) TailPrint() {
+	fmt.Print("tail=")
+	currentNode := doubleLink.tail
+	if currentNode != nil {
+		currentNode.Print()
+		for currentNode.prev != nil {
+			currentNode = currentNode.prev
+			currentNode.Print()
+		}
+	}
+	fmt.Println("=header")
 }
